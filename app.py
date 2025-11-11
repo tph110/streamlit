@@ -150,7 +150,7 @@ def predict_image(img):
         return None
 
 # UI
-st.title("🩺 DermScan - Dermascope Imaging Analysis Tool")
+st.title("🩺 DermScan - Dermascopic Imaging Analysis Tool")
 st.markdown(f"**Clinical Performance:** F1: {MODEL_METRICS['f1_score']:.1f}% | Sensitivity: ~88-90% | Accuracy: {MODEL_METRICS['accuracy']:.1f}% | Trained on over 10,000 images")
 
 # Warning box
@@ -159,10 +159,10 @@ st.error("""
 
 **FOR RESEARCH PURPOSES ONLY**
 
-- 🚫 DO NOT solely use this tool for diagnostic purposes
-- 👨‍⚕️ ALWAYS consult a dermatologist for any skin concerns
+- 🚫 Not to be used for diagnostic purposes
+- ✅ ALWAYS consult a trained medical professional
 - 🔬 Only a biopsy can definitively diagnose or exclude skin cancer
-- ⚖️ Not FDA/NICE approved • For educational/research purposes only
+- ⚖️ Not FDA/NICE approved • For educational and research purposes only
 """)
 
 # Two columns layout for upload and results
@@ -236,8 +236,8 @@ with col2:
             ### 🚨 HIGH RISK - Potential Malignant Lesion Detected (P > {MALIGNANT_THRESHOLD})
             
             **Immediate Actions Required:**
-            1. 📞 Contact a dermatologist immediately
-            2. 📅 Schedule appointment within 2 weeks
+            1. 📞 Contact a healthcare professional immediately
+            2. 📅 Schedule appointment with a Dermatologist within 2 weeks
             3. 📸 Bring this image to your appointment
             4. ⏰ Do not delay - early detection is critical
             
