@@ -151,7 +151,7 @@ def predict_image(img):
 
 # UI
 st.title("🩺 DermScan - Dermascope Imaging Analysis Tool")
-st.markdown(f"**Clinical Performance:** F1: {MODEL_METRICS['f1_score']:.1f}% | Sensitivity: ~88-90% | Accuracy: {MODEL_METRICS['accuracy']:.1f}%")
+st.markdown(f"**Clinical Performance:** F1: {MODEL_METRICS['f1_score']:.1f}% | Sensitivity: ~88-90% | Accuracy: {MODEL_METRICS['accuracy']:.1f}% | Trained on over 10,000 images")
 
 # Warning box
 st.error("""
@@ -159,7 +159,7 @@ st.error("""
 
 **FOR RESEARCH PURPOSES ONLY**
 
-- 🚫 DO NOT use this for self-diagnosis or treatment decisions
+- 🚫 DO NOT solely use this tool for diagnostic purposes
 - 👨‍⚕️ ALWAYS consult a dermatologist for any skin concerns
 - 🔬 Only a biopsy can definitively diagnose or exclude skin cancer
 - ⚖️ Not FDA/NICE approved • For educational/research purposes only
@@ -275,7 +275,7 @@ with col2:
             **Decision Threshold:** {MALIGNANT_THRESHOLD} (optimized to catch ~88-90% of malignant cases)
             """)
     else:
-        st.info("Upload an image and click 'Analyze Lesion' to see results")
+        st.info("Upload an image and click 'Analyse Lesion' to see results")
 
 # Expandable sections
 with st.expander("📖 The ABCDE Rule for Monitoring"):
@@ -300,11 +300,6 @@ with st.expander("🔬 About This Model"):
     - Enhanced Sensitivity: ~88-90% (at {MALIGNANT_THRESHOLD} threshold)
     - Accuracy: {MODEL_METRICS['accuracy']:.2f}%
     
-    **Performance:**
-    - Trained to clinical standards
-    - Optimized to minimize missed cancers
-    - ~10-12% of malignant cases may still be missed
-    - Regular dermatology screenings remain essential
     """)
 
 with st.expander("🌐 Additional Resources"):
@@ -314,19 +309,14 @@ with st.expander("🌐 Additional Resources"):
     - [Skin Cancer Foundation](https://www.skincancer.org)
     - [American Cancer Society - Skin Cancer](https://www.cancer.org/cancer/skin-cancer.html)
     
-    **Prevention:**
-    - Use broad-spectrum SPF 30+ sunscreen daily
-    - Avoid tanning beds
-    - Perform monthly self-examinations
-    - Get annual full-body skin checks
     """)
 
 # Footer
 st.markdown("---")
 st.markdown("""
 <p style="text-align: center; color: #666;">
-<strong>🩺 DermAI - Clinical-Grade Skin Cancer Screening</strong><br>
-<em>Educational tool • Not for medical diagnosis • Always consult a dermatologist</em><br>
+<strong>🩺 DermScan - Dermascopic image analysis tool</strong><br>
+<em>Educational tool • Not for medical diagnosis</em><br>
 <small>Model: EfficientNet-B4 | F1: 85.2% | Dr Tom Hutchinson, Oxford, UK</small>
 </p>
 """, unsafe_allow_html=True)
