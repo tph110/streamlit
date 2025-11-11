@@ -196,8 +196,9 @@ with col1:
     **📋 Image Guidelines:**
     - ✅ Dermatoscope images only
     - ✅ Ensure lesion is centered and in focus
-    - ✅ Ensure good lighting
+    - ✅ Ensure optimal lighting
     - ⚠️ Avoid blurry or dark images
+    - ⚠️ Do not upload any patient identifiable data 
     """)
 
 with col2:
@@ -236,10 +237,9 @@ with col2:
             ### 🚨 HIGH RISK - Potential Malignant Lesion Detected (P > {MALIGNANT_THRESHOLD})
             
             **Immediate Actions Required:**
-            1. 📞 Contact a healthcare professional immediately
-            2. 📅 Schedule appointment with a Dermatologist within 2 weeks
-            3. 📸 Bring this image to your appointment
-            4. ⏰ Do not delay - early detection is critical
+            1. 📅 Warrants an urgent referral to a Dermatologist within 2 weeks
+            2. 📸 Include this image in the referral
+            3. ⏰ Do not delay - early detection is critical
             
             **About Malignant Lesions:**
             - Can include melanoma, basal cell carcinoma, or squamous cell carcinoma
@@ -251,10 +251,9 @@ with col2:
             ### ✅ LOWER RISK - Appears Benign (P < {MALIGNANT_THRESHOLD})
             
             **Recommended Actions:**
-            1. 📅 Schedule routine dermatology checkup (within 6 months)
-            2. 👁️ Monitor the lesion regularly for changes
-            3. 📸 Take monthly photos to track changes
-            4. 🏥 See doctor immediately if ANY new changes occur
+            1. 👁️ Monitor the lesion regularly for changes
+            2. 📸 Take monthly photos to track changes
+            3. 🏥 To be reviewed again by a healthcare professional immediately if ANY new changes occur
             
             **Remember:**
             - Even benign lesions should be monitored
@@ -305,6 +304,7 @@ with st.expander("🔬 About This Model"):
 with st.expander("🌐 Additional Resources"):
     st.markdown("""
     **Find Professional Help:**
+    - [British Association of Dermatology] (https://www.skinhealthinfo.org.uk)
     - [American Academy of Dermatology - Find a Dermatologist](https://www.aad.org/find-a-derm)
     - [Skin Cancer Foundation](https://www.skincancer.org)
     - [American Cancer Society - Skin Cancer](https://www.cancer.org/cancer/skin-cancer.html)
