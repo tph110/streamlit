@@ -3,6 +3,9 @@ import torch
 from torchvision import transforms
 from PIL import Image
 import timm
+import os
+import requests
+from io import BytesIO
 
 # Page config
 st.set_page_config(
@@ -18,6 +21,10 @@ NUM_CLASSES = 2
 CLASS_NAMES = ["Benign", "Malignant"]
 MALIGNANT_THRESHOLD = 0.35
 
+# FINAL FIX: Using the direct Hugging Face URL to bypass Git LFS issues.
+MODEL_URL = "https://huggingface.co/Skindoc/streamlitapp/resolve/main/model.pth"
+MODEL_PATH = "model_cache.pth"
+
 MODEL_METRICS = {
     'f1_score': 85.24,
     'sensitivity': 83.01,
@@ -25,47 +32,111 @@ MODEL_METRICS = {
     'epoch': 40
 }
 
+# Helper function to download the model file
+@st.cache_resource(show_spinner=False)
+def download_file(url, path):
+    """Downloads a file securely if it doesn't exist."""
+    if os.path.exists(path):
+        return
+        
+    st.info(f"Downloading model from external source (approx. 71 MB)... This might take a moment.")
+    try:
+        # Initial estimate for total size
+        # Using the actual size for a more accurate progress bar
+        total_size = 70950235
+        
+        response = requests.get(url, stream=True, timeout=60) # Increased timeout for large files
+        response.raise_for_status() 
+
+        # Use actual content-length if available
+        if 'content-length' in response.headers:
+            total_size = int(response.headers['content-length'])
+            
+        block_size = 1024 * 10 # 10 Kibibytes for faster progress updates
+        
+        progress_bar = st.progress(0, text="Download progress...")
+        
+        with open(path, 'wb') as f:
+            downloaded_size = 0
+            for data in response.iter_content(block_size):
+                f.write(data)
+                downloaded_size += len(data)
+                
+                # Ensure we don't divide by zero
+                if total_size > 0:
+                    progress = min(int(downloaded_size * 100 / total_size), 99)
+                    progress_text = f"Download progress: {round(downloaded_size / (1024*1024), 1)} MB of {round(total_size / (1024*1024), 1)} MB"
+                else:
+                    progress = 0
+                    progress_text = f"Download progress: {round(downloaded_size / (1024*1024), 1)} MB downloaded"
+                    
+                progress_bar.progress(progress, text=progress_text)
+                
+        progress_bar.progress(100, text="Model download complete!")
+        st.success("Model ready.")
+    except Exception as e:
+        st.error(f"Failed to download model from {url}. Error: {e}")
+        st.stop() # Stop execution if model download fails
+
 # Load model
 @st.cache_resource
 def load_model():
+    """Loads the EfficientNet-B4 model with cached resource functionality."""
+    
+    # 1. Download the file first
+    download_file(MODEL_URL, MODEL_PATH)
+
     try:
         model = timm.create_model(
             MODEL_NAME, 
             pretrained=False, 
             num_classes=NUM_CLASSES
         )
-        state_dict = torch.load("model.pth", map_location="cpu", weights_only=False)
+        
+        # 2. Load the model from the local downloaded path
+        # weights_only=False resolves the PyTorch 2.6+ compatibility issue
+        # Note: We are now loading the correct binary file, so the 'invalid load key' error should be fixed here.
+        state_dict = torch.load(MODEL_PATH, map_location="cpu", weights_only=False)
+        
         model.load_state_dict(state_dict)
         model.eval()
         return model
     except Exception as e:
-        st.error(f"Error loading model: {e}")
+        st.error(f"Error loading model: {e}. **Action Required:** Please ensure your MODEL_URL is correct and the downloaded file is a complete PyTorch binary.")
         return None
 
+# Load the model globally
 model = load_model()
 
 # Preprocessing
 preprocess = transforms.Compose([
     transforms.Resize((IMG_SIZE, IMG_SIZE)),
     transforms.ToTensor(),
+    # Standard normalization for ImageNet-trained models
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 ])
 
 # Prediction function
 def predict_image(img):
-    if img is None:
+    """Processes the image and returns prediction probabilities."""
+    # Check if the model loaded successfully (model will be None if it failed)
+    if img is None or model is None:
+        # The 'NoneType' object is not callable error is solved by fixing the model loading above.
         return None
     
     try:
         if img.mode != "RGB":
             img = img.convert("RGB")
         
+        # Apply preprocessing and add batch dimension
         x = preprocess(img).unsqueeze(0)
         
         with torch.no_grad():
             logits = model(x)
+            # Apply softmax to convert logits to probabilities
             probs = torch.softmax(logits, dim=1)[0]
         
+        # Assuming index 0 is Benign and index 1 is Malignant
         benign_prob = float(probs[0])
         malignant_prob = float(probs[1])
         
@@ -94,7 +165,7 @@ st.error("""
 - ⚖️ Not FDA approved • For educational and screening purposes only
 """)
 
-# Two columns
+# Two columns layout for upload and results
 col1, col2 = st.columns(2)
 
 with col1:
@@ -110,12 +181,16 @@ with col1:
         image = Image.open(uploaded_file)
         st.image(image, caption="Uploaded Image", use_column_width=True)
         
-        if st.button("🔍 Analyze Lesion", type="primary", use_container_width=True):
-            with st.spinner("Analyzing..."):
-                result = predict_image(image)
-                
-                if result:
-                    st.session_state['result'] = result
+        # Button to trigger analysis
+        if st.button("🔍 Analyze Lesion", type="primary", use_container_width=True, disabled=(model is None)):
+            if model is None:
+                st.warning("Cannot analyze: Model failed to load. Please fix the 'Error loading model' issue above.")
+            else:
+                with st.spinner("Analyzing..."):
+                    result = predict_image(image)
+                    
+                    if result:
+                        st.session_state['result'] = result
     
     st.info("""
     **📋 Image Guidelines:**
@@ -143,6 +218,7 @@ with col2:
                 f"{result['malignant']*100:.1f}%",
                 delta=None
             )
+            # Use a custom color for malignant progress bar if possible (Streamlit default)
             st.progress(result['malignant'])
         
         with ben_col:
@@ -157,8 +233,8 @@ with col2:
         
         # Risk assessment
         if result['is_high_risk']:
-            st.error("""
-            ### 🚨 HIGH RISK - Potential Malignant Lesion Detected
+            st.error(f"""
+            ### 🚨 HIGH RISK - Potential Malignant Lesion Detected (P > {MALIGNANT_THRESHOLD})
             
             **Immediate Actions Required:**
             1. 📞 Contact a dermatologist immediately
@@ -172,8 +248,8 @@ with col2:
             - Treatment success is highest with early detection
             """)
         else:
-            st.success("""
-            ### ✅ LOWER RISK - Appears Benign
+            st.success(f"""
+            ### ✅ LOWER RISK - Appears Benign (P < {MALIGNANT_THRESHOLD})
             
             **Recommended Actions:**
             1. 📅 Schedule routine dermatology checkup (within 3-6 months)
@@ -213,8 +289,7 @@ with st.expander("📖 The ABCDE Rule for Monitoring"):
     - **D - Diameter:** Larger than 6mm (pencil eraser)
     - **E - Evolving:** Changes in size, shape, or color
     
-    **If you notice ANY of these, see a dermatologist immediately!**
-    """)
+    **If you notice ANY of these, see a dermatologist immediately!** """)
 
 with st.expander("🔬 About This Model"):
     st.markdown(f"""
