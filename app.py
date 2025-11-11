@@ -39,7 +39,7 @@ def download_file(url, path):
     if os.path.exists(path):
         return
         
-    st.info(f"Downloading model from external source (approx. 71 MB)... This might take a moment.")
+    st.info(f"Downloading DermScan model... This might take a moment.")
     try:
         # Initial estimate for total size
         # Using the actual size for a more accurate progress bar
@@ -150,31 +150,31 @@ def predict_image(img):
         return None
 
 # UI
-st.title("🩺 DermAI - Clinical-Grade Skin Cancer Screening")
+st.title("🩺 DermScan - Dermascope Imaging Analysis Tool")
 st.markdown(f"**Clinical Performance:** F1: {MODEL_METRICS['f1_score']:.1f}% | Sensitivity: ~88-90% | Accuracy: {MODEL_METRICS['accuracy']:.1f}%")
 
 # Warning box
 st.error("""
-**⚠️ CRITICAL MEDICAL DISCLAIMER**
+**⚠️ DISCLAIMER**
 
-**THIS IS NOT A MEDICAL DIAGNOSIS TOOL**
+**FOR RESEARCH PURPOSES ONLY**
 
 - 🚫 DO NOT use this for self-diagnosis or treatment decisions
-- 👨‍⚕️ ALWAYS consult a board-certified dermatologist for any skin concerns
-- 🔬 Only a biopsy can definitively diagnose skin cancer
-- ⚖️ Not FDA approved • For educational and screening purposes only
+- 👨‍⚕️ ALWAYS consult a dermatologist for any skin concerns
+- 🔬 Only a biopsy can definitively diagnose or exclude skin cancer
+- ⚖️ Not FDA/NICE approved • For educational/research purposes only
 """)
 
 # Two columns layout for upload and results
 col1, col2 = st.columns(2)
 
 with col1:
-    st.subheader("📤 Upload Skin Lesion Image")
+    st.subheader("📤 Upload Dermascope Image")
     
     uploaded_file = st.file_uploader(
         "Choose an image...",
         type=['jpg', 'jpeg', 'png'],
-        help="Upload a clear dermatoscope or clinical photo"
+        help="Upload a clear dermascope photo"
     )
     
     if uploaded_file is not None:
@@ -182,7 +182,7 @@ with col1:
         st.image(image, caption="Uploaded Image", use_column_width=True)
         
         # Button to trigger analysis
-        if st.button("🔍 Analyze Lesion", type="primary", use_container_width=True, disabled=(model is None)):
+        if st.button("🔍 Analyse Lesion", type="primary", use_container_width=True, disabled=(model is None)):
             if model is None:
                 st.warning("Cannot analyze: Model failed to load. Please fix the 'Error loading model' issue above.")
             else:
@@ -194,10 +194,9 @@ with col1:
     
     st.info("""
     **📋 Image Guidelines:**
-    - ✅ Dermatoscope images preferred
-    - ✅ Clinical photos also work
+    - ✅ Dermatoscope images only
     - ✅ Ensure lesion is centered and in focus
-    - ✅ Use good lighting
+    - ✅ Ensure good lighting
     - ⚠️ Avoid blurry or dark images
     """)
 
@@ -238,7 +237,7 @@ with col2:
             
             **Immediate Actions Required:**
             1. 📞 Contact a dermatologist immediately
-            2. 📅 Schedule appointment within 1-2 weeks
+            2. 📅 Schedule appointment within 2 weeks
             3. 📸 Bring this image to your appointment
             4. ⏰ Do not delay - early detection is critical
             
@@ -252,10 +251,10 @@ with col2:
             ### ✅ LOWER RISK - Appears Benign (P < {MALIGNANT_THRESHOLD})
             
             **Recommended Actions:**
-            1. 📅 Schedule routine dermatology checkup (within 3-6 months)
+            1. 📅 Schedule routine dermatology checkup (within 6 months)
             2. 👁️ Monitor the lesion regularly for changes
             3. 📸 Take monthly photos to track changes
-            4. 🏥 See doctor immediately if ANY changes occur
+            4. 🏥 See doctor immediately if ANY new changes occur
             
             **Remember:**
             - Even benign lesions should be monitored
@@ -328,6 +327,6 @@ st.markdown("""
 <p style="text-align: center; color: #666;">
 <strong>🩺 DermAI - Clinical-Grade Skin Cancer Screening</strong><br>
 <em>Educational tool • Not for medical diagnosis • Always consult a dermatologist</em><br>
-<small>Model: EfficientNet-B4 | F1: 85.2% | Built with ❤️ for better skin health</small>
+<small>Model: EfficientNet-B4 | F1: 85.2% | Dr Tom Hutchinson, Oxford, UK</small>
 </p>
 """, unsafe_allow_html=True)
