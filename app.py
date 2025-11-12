@@ -488,8 +488,7 @@ with col1:
                     result = predict_image(image)
                     if result:
                         st.session_state['result'] = result
-                        st.success("✅ Analysis complete!")
-                        st.rerun()
+                        st.experimental_rerun()
     else:
         st.markdown("""
         <div class="upload-section">
