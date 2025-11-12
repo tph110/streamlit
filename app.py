@@ -150,7 +150,7 @@ def predict_image(img):
         return None
 
 # UI
-st.title("🩺 DermScan - Dermascopic Imaging Analysis Tool")
+st.title("🩺 DermScan - Dermoscopic Imaging Analysis Tool")
 st.markdown(f"**Clinical Performance:** F1: {MODEL_METRICS['f1_score']:.1f}% | Sensitivity: ~88-90% | Accuracy: {MODEL_METRICS['accuracy']:.1f}% | Trained on over 10,000 images")
 
 # Warning box
@@ -169,7 +169,7 @@ st.error("""
 col1, col2 = st.columns(2)
 
 with col1:
-    st.subheader("📤 Upload Dermascope Image")
+    st.subheader("📤 Upload Dermoscope Image")
     
     uploaded_file = st.file_uploader(
         "Choose an image...",
@@ -253,7 +253,7 @@ with col2:
             **Recommended Actions:**
             1. 👁️ Monitor the lesion regularly for changes
             2. 📸 Take monthly photos to track changes
-            3. 🏥 To be reviewed again by a healthcare professional immediately if ANY new changes occur
+            3. 🏥 To be reviewed again by a healthcare professional immediately if any new changes occur
             
             **Remember:**
             - Even benign lesions should be monitored
@@ -315,7 +315,7 @@ with st.expander("🌐 Additional Resources"):
 st.markdown("---")
 st.markdown("""
 <p style="text-align: center; color: #666;">
-<strong>🩺 DermScan - Dermascopic image analysis tool</strong><br>
+<strong>🩺 DermScan - Dermoscopic image analysis tool</strong><br>
 <em>Educational tool • Not for medical diagnosis</em><br>
 <small>Model: EfficientNet-B4 | F1: 85.2% | Dr Tom Hutchinson, Oxford, UK</small>
 </p>
