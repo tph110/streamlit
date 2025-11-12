@@ -9,7 +9,7 @@ from io import BytesIO
 
 # Page config
 st.set_page_config(
-    page_title="DermAI - Skin Cancer Screening",
+    page_title="DermScan - Dermoscope image analysis",
     page_icon="🩺",
     layout="wide"
 )
@@ -39,7 +39,7 @@ def download_file(url, path):
     if os.path.exists(path):
         return
         
-    st.info(f"Downloading DermScan model... This might take a moment.")
+    st.info(f"Downloading DermScan model engine... This might take a moment.")
     try:
         # Initial estimate for total size
         # Using the actual size for a more accurate progress bar
